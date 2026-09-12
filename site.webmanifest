@@ -1,0 +1,21 @@
+{
+  "name": "जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — डिजिटल विवरणिका",
+  "short_name": "जय जगन्नाथ",
+  "description": "भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य — भव्य आमंत्रण एवं कृति विमोचन समारोह",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0B0B0D",
+  "theme_color": "#0B0B0D",
+  "icons": [
+    {
+      "src": "assets/brand/logo.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

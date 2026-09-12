@@ -1,0 +1,385 @@
+/* ==========================================================================
+   FULL-SCREEN 3D FLIPBOOK (WHATSAPP-FIRST • WITH AMBIENT FLUTE MUSIC)
+   Maximum screen real estate • Zero clutter • Instant load
+   ========================================================================== */
+
+:root {
+  --bg-color: #070709;
+  --accent-color: #D97706;
+  --accent-hover: #F59E0B;
+  --text-primary: #FFFFFF;
+  --text-muted: rgba(255, 255, 255, 0.65);
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+  --app-height: 100dvh;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  height: var(--app-height, 100vh);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Ambient Background Radial Glow */
+.ambient-stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(217, 119, 6, 0.05) 0%, #070709 100%);
+}
+
+/* Floating Sound Toggle Button (Top Right) */
+.sound-toggle-btn {
+  position: fixed;
+  top: 12px;
+  top: calc(10px + env(safe-area-inset-top));
+  right: 14px;
+  right: calc(12px + env(safe-area-inset-right));
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(18, 18, 22, 0.82);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  border-radius: 20px;
+  color: var(--accent-hover);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.sound-toggle-btn.playing {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.3);
+  animation: gentleGlow 2.5s infinite alternate ease-in-out;
+}
+
+.sound-toggle-btn.muted {
+  color: var(--text-muted);
+  border-color: rgba(255, 255, 255, 0.12);
+  animation: none;
+}
+
+@keyframes gentleGlow {
+  from { box-shadow: 0 0 4px rgba(217, 119, 6, 0.1); }
+  to { box-shadow: 0 0 14px rgba(217, 119, 6, 0.35); }
+}
+
+/* Full Viewport Container */
+.viewport-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: var(--app-height, 100vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Zoom Wrapper */
+.zoom-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 200ms var(--ease-cinematic);
+}
+
+.zoom-wrapper.panning {
+  cursor: grabbing;
+  transition: none;
+}
+
+/* Book Stage — Maximum Viewport Utilization */
+.book-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 96%;
+  height: calc(var(--app-height, 100vh) - 12px);
+  max-width: 1300px;
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 0.35s var(--ease-cinematic), transform 0.35s var(--ease-cinematic);
+}
+
+.book-stage.ready {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* StPageFlip Elements */
+.book {
+  position: relative;
+  z-index: 10;
+  margin: 0 auto;
+}
+
+.page {
+  position: relative;
+  background-color: #0E0E12;
+  overflow: hidden;
+}
+
+.page img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  background-color: #FFFFFF;
+}
+
+/* Page gutter shadow on spreads */
+.page:nth-child(even)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.25) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.page:nth-child(odd)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 16px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.25) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Tap Zones — Left/Right touch area */
+.tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32%;
+  z-index: 15;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tap-left { left: 0; }
+.tap-right { right: 0; }
+
+/* Ultra-Compact Bottom Floating Navigation Pill */
+.toolbar {
+  position: fixed;
+  bottom: 12px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(18, 18, 22, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.tb-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--accent-hover);
+}
+
+.tb-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.tb-btn--share {
+  color: var(--accent-hover);
+}
+
+.page-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 6px;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tb-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 2px;
+}
+
+/* Share Modal Sheet */
+.share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.share-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.share-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.share-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: #18181E;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px 18px calc(20px + env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+.share-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.share-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #FFFFFF;
+}
+
+.share-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.share-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.share-wa {
+  background: #25D366;
+  color: #FFFFFF;
+}
+
+.share-copy {
+  background: #282834;
+  color: #FFFFFF;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  background: #22222C;
+  border: 1px solid var(--accent-color);
+  color: #FFFFFF;
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Portrait (< 768px): Maximum Immersion */
+@media (max-width: 767px) {
+  .book-stage {
+    width: 98vw;
+    height: 95%;
+    height: calc(var(--app-height, 100vh) - 12px);
+  }
+}

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF → Flipbook WebP Images Exporter</title>
+  <style>
+    :root {
+      --bg: #0B0B0D;
+      --card: #15151A;
+      --accent: #D97706;
+      --accent-light: #F59E0B;
+      --text: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --border: rgba(255, 255, 255, 0.1);
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --success: #10B981;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 20px 60px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 span.badge {
+      font-size: 12px;
+      padding: 3px 8px;
+      background: rgba(217, 119, 6, 0.2);
+      border: 1px solid var(--accent);
+      color: var(--accent-light);
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    p.subtitle {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      background: var(--card);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-bottom: 24px;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(217, 119, 6, 0.05);
+    }
+    .drop-zone svg {
+      stroke: var(--accent);
+      margin-bottom: 12px;
+    }
+    .drop-zone h3 {
+      margin: 0 0 6px 0;
+      font-size: 17px;
+    }
+    .drop-zone p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .status-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .status-card.visible { display: block; }
+    .warnings-container {
+      margin-bottom: 16px;
+    }
+    .warning-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--warning);
+      color: #FCD34D;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .warning-chip.danger {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: var(--danger);
+      color: #FCA5A5;
+    }
+    .actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+    .btn-primary:hover { background: var(--accent-light); }
+    .btn-secondary {
+      background: #23232C;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: #2E2E3A; }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .page-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .page-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      background: #FFFFFF;
+      margin-bottom: 10px;
+    }
+    .page-info {
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+    .page-size-badge {
+      font-weight: 600;
+      color: var(--success);
+    }
+    .page-size-badge.warning {
+      color: var(--danger);
+    }
+    .code-box {
+      background: #0E0E12;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+    .code-box pre {
+      margin: 0;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      color: #D1D5DB;
+    }
+    .copy-code-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #23232C;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .copy-code-btn:hover { background: var(--accent); color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PDF → Flipbook WebP Exporter <span class="badge">Local & Private</span></h1>
+      <p class="subtitle">Converts any PDF to high-performance WebP images for your 3D flipbook. Files never leave your browser.</p>
+    </header>
+
+    <div class="drop-zone" id="drop-zone">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="12" y1="18" x2="12" y2="12"></line>
+        <line x1="9" y1="15" x2="15" y2="15"></line>
+      </svg>
+      <h3>Drop your PDF brochure here</h3>
+      <p>or click to browse from device</p>
+      <input type="file" id="file-input" accept="application/pdf">
+    </div>
+
+    <div class="status-card" id="status-card">
+      <div class="warnings-container" id="warnings-container"></div>
+      <div id="progress-text" style="font-size: 14px; font-weight: 500; margin-bottom: 12px;"></div>
+
+      <div class="actions-bar" id="actions-bar">
+        <button class="btn btn-primary" id="btn-download-desktop">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Desktop Set (1600px WebP)
+        </button>
+        <button class="btn btn-secondary" id="btn-download-mobile">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          Download Mobile Set (1100px WebP)
+        </button>
+        <button class="btn btn-secondary" id="btn-download-og">
+          Download og-preview.jpg (1200×630)
+        </button>
+      </div>
+
+      <div class="grid" id="pages-grid"></div>
+
+      <div style="margin-top: 24px;">
+        <h3 style="margin-bottom: 8px; font-size: 16px;">Generated config.js pages[] snippet:</h3>
+        <div class="code-box">
+          <button class="copy-code-btn" id="copy-code-btn">Copy Snippet</button>
+          <pre><code id="config-code"></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const statusCard = document.getElementById('status-card');
+    const warningsContainer = document.getElementById('warnings-container');
+    const progressText = document.getElementById('progress-text');
+    const pagesGrid = document.getElementById('pages-grid');
+    const configCode = document.getElementById('config-code');
+    const btnDownloadDesktop = document.getElementById('btn-download-desktop');
+    const btnDownloadMobile = document.getElementById('btn-download-mobile');
+    const btnDownloadOg = document.getElementById('btn-download-og');
+    const copyCodeBtn = document.getElementById('copy-code-btn');
+
+    let processedPages = [];
+    let ogBlob = null;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) handlePdfFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) handlePdfFile(fileInput.files[0]);
+    });
+
+    async function handlePdfFile(file) {
+      if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+        alert('Please select a valid PDF file.');
+        return;
+      }
+
+      statusCard.classList.add('visible');
+      warningsContainer.innerHTML = '';
+      pagesGrid.innerHTML = '';
+      processedPages = [];
+      progressText.textContent = 'Loading PDF document...';
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const numPages = pdf.numPages;
+
+      if (numPages % 2 !== 0) {
+        addWarning(`Odd page count (${numPages} pages). StPageFlip requires an even number of pages for spreads; our runtime will automatically append a matching filler page.`);
+      }
+
+      for (let i = 1; i <= numPages; i++) {
+        progressText.textContent = `Rendering page ${i} of ${numPages}...`;
+        const page = await pdf.getPage(i);
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const ratio = unscaledViewport.width / unscaledViewport.height;
+
+        if (i === 1 && Math.abs(ratio - 0.75) > 0.08 && Math.abs(ratio - (595/842)) > 0.08) {
+          addWarning(`Page aspect ratio is ${ratio.toFixed(2)}. Standard editorial is 0.75 (3:4) or 0.71 (A4). Config aspectRatio should match.`);
+        }
+
+        // Render Desktop: long edge 1600px
+        const scaleDesk = 1600 / Math.max(unscaledViewport.width, unscaledViewport.height);
+        const vDesk = page.getViewport({ scale: scaleDesk });
+        const cDesk = document.createElement('canvas');
+        cDesk.width = vDesk.width;
+        cDesk.height = vDesk.height;
+        const ctxDesk = cDesk.getContext('2d');
+        ctxDesk.fillStyle = '#FFFFFF';
+        ctxDesk.fillRect(0, 0, cDesk.width, cDesk.height);
+        await page.render({ canvasContext: ctxDesk, viewport: vDesk }).promise;
+        const blobDesk = await canvasToBlob(cDesk, 'image/webp', 0.82);
+
+        // Render Mobile: long edge 1100px
+        const scaleMob = 1100 / Math.max(unscaledViewport.width, unscaledViewport.height);
+        const vMob = page.getViewport({ scale: scaleMob });
+        const cMob = document.createElement('canvas');
+        cMob.width = vMob.width;
+        cMob.height = vMob.height;
+        const ctxMob = cMob.getContext('2d');
+        ctxMob.fillStyle = '#FFFFFF';
+        ctxMob.fillRect(0, 0, cMob.width, cMob.height);
+        await page.render({ canvasContext: ctxMob, viewport: vMob }).promise;
+        const blobMob = await canvasToBlob(cMob, 'image/webp', 0.80);
+
+        const deskSizeKb = (blobDesk.size / 1024).toFixed(1);
+        const mobSizeKb = (blobMob.size / 1024).toFixed(1);
+
+        if (blobDesk.size > 350 * 1024) {
+          addWarning(`Page ${i} desktop size is ${deskSizeKb}KB (> 350KB). Consider reducing quality to 0.75.`, true);
+        }
+
+        processedPages.push({
+          pageNumber: i,
+          desktopBlob: blobDesk,
+          mobileBlob: blobMob,
+          canvas: cDesk
+        });
+
+        // Render preview card
+        const card = document.createElement('div');
+        card.className = 'page-card';
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(blobDesk);
+        card.appendChild(img);
+
+        const info = document.createElement('div');
+        info.className = 'page-info';
+        info.innerHTML = `<span>Page ${i}</span> <span class="page-size-badge ${blobDesk.size > 350*1024 ? 'warning' : ''}">${deskSizeKb} KB</span>`;
+        card.appendChild(info);
+        pagesGrid.appendChild(card);
+
+        // Generate OG Preview if page 1
+        if (i === 1) {
+          ogBlob = await generateOgPreview(cDesk);
+        }
+      }
+
+      progressText.textContent = `All ${numPages} pages processed successfully!`;
+      updateConfigSnippet(numPages);
+    }
+
+    function addWarning(text, isDanger = false) {
+      const chip = document.createElement('div');
+      chip.className = `warning-chip ${isDanger ? 'danger' : ''}`;
+      chip.innerHTML = `<span>⚠️ ${text}</span>`;
+      warningsContainer.appendChild(chip);
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), type, quality);
+      });
+    }
+
+    async function generateOgPreview(page1Canvas) {
+      const ogCanvas = document.createElement('canvas');
+      ogCanvas.width = 1200;
+      ogCanvas.height = 630;
+      const ctx = ogCanvas.getContext('2d');
+
+      // Background #0B0B0D
+      ctx.fillStyle = '#0B0B0D';
+      ctx.fillRect(0, 0, 1200, 630);
+
+      // Radial ambient glow
+      const grad = ctx.createRadialGradient(600, 315, 0, 600, 315, 500);
+      grad.addColorStop(0, 'rgba(217, 119, 6, 0.22)');
+      grad.addColorStop(1, 'rgba(11, 11, 13, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1200, 630);
+
+      // Draw page 1 centered with shadow
+      const ph = 510;
+      const pw = Math.round(ph * (page1Canvas.width / page1Canvas.height));
+      const bx = (1200 - pw) / 2;
+      const by = (630 - ph) / 2;
+
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 32;
+      ctx.shadowOffsetY = 12;
+      ctx.drawImage(page1Canvas, bx, by, pw, ph);
+
+      return await canvasToBlob(ogCanvas, 'image/jpeg', 0.85);
+    }
+
+    function updateConfigSnippet(count) {
+      const lines = [];
+      lines.push('  pages: [');
+      for (let i = 1; i <= count; i++) {
+        const altText = i === 1 ? 'Front cover' : (i === count ? 'Back cover' : `Page ${i}`);
+        lines.push(`    { desktop: 'assets/pages/page-${i}.webp', mobile: 'assets/pages/mobile/page-${i}.webp', alt: '${altText}' }${i < count ? ',' : ''}`);
+      }
+      lines.push('  ]');
+      configCode.textContent = lines.join('\n');
+    }
+
+    // Sequential downloads (no external JSZip)
+    btnDownloadDesktop.addEventListener('click', async () => {
+      for (const p of processedPages) {
+        triggerDownload(p.desktopBlob, `page-${p.pageNumber}.webp`);
+        await new Promise(r => setTimeout(r, 200));
+      }
+    });
+
+    btnDownloadMobile.addEventListener('click', async () => {
+      for (const p of processedPages) {
+        triggerDownload(p.mobileBlob, `page-${p.pageNumber}.webp`);
+        await new Promise(r => setTimeout(r, 200));
+      }
+    });
+
+    btnDownloadOg.addEventListener('click', () => {
+      if (ogBlob) triggerDownload(ogBlob, 'og-preview.jpg');
+    });
+
+    function triggerDownload(blob, filename) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    copyCodeBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(configCode.textContent).then(() => {
+        copyCodeBtn.textContent = 'Copied!';
+        setTimeout(() => copyCodeBtn.textContent = 'Copy Snippet', 1500);
+      });
+    });
+  </script>
+</body>
+</html>

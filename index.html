@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — डिजिटल विवरणिका</title>
+  <meta name="description" content="भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य — भव्य आमंत्रण एवं कृति विमोचन समारोह। 3D डिजिटल विवरणिका।">
+  <link rel="canonical" href="https://borntoflyrjbc.github.io/jagannath-brochure/">
+
+  <!-- Open Graph / WhatsApp / Facebook Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="जय जगन्नाथ मिशन अन्तर्राष्ट्रीय">
+  <meta property="og:title" content="जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — डिजिटल विवरणिका">
+  <meta property="og:description" content="भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य — भव्य आमंत्रण एवं कृति विमोचन समारोह। 3D डिजिटल विवरणिका।">
+  <meta property="og:url" content="https://borntoflyrjbc.github.io/jagannath-brochure/">
+  <meta property="og:image" content="https://borntoflyrjbc.github.io/jagannath-brochure/assets/og-preview.jpg">
+  <meta property="og:image:secure_url" content="https://borntoflyrjbc.github.io/jagannath-brochure/assets/og-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="जय जगन्नाथ मिशन आमंत्रण विवरणिका मुखपृष्ठ">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — डिजिटल विवरणिका">
+  <meta name="twitter:description" content="भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य — भव्य आमंत्रण एवं कृति विमोचन समारोह। 3D डिजिटल विवरणिका।">
+  <meta name="twitter:image" content="https://borntoflyrjbc.github.io/jagannath-brochure/assets/og-preview.jpg">
+
+  <!-- Theme & PWA -->
+  <meta name="theme-color" content="#070709">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="site.webmanifest">
+
+  <!-- Critical Preload Page 1 -->
+  <link rel="preload" as="image" href="assets/pages/mobile/page-1.webp">
+
+  <!-- Inline Critical CSS -->
+  <style>
+    :root {
+      --bg: #070709;
+      --accent: #D97706;
+      --app-height: 100dvh;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      height: var(--app-height, 100vh);
+      background: var(--bg);
+      color: #FFF;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      position: fixed; inset: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    #preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.25s ease, visibility 0.25s;
+    }
+    #preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 15px var(--accent);
+      animation: pulse 1s infinite alternate;
+    }
+    .loader-txt { margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; }
+    @keyframes pulse { from { transform: scale(0.8); opacity: 0.5; } to { transform: scale(1.3); opacity: 1; } }
+  </style>
+
+  <link rel="stylesheet" href="vendor/page-flip.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="vendor/page-flip.browser.min.js" defer></script>
+  <script src="config.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <!-- Instant Preloader -->
+  <div id="preloader">
+    <div class="loader-dot"></div>
+    <div class="loader-txt">जय जगन्नाथ...</div>
+  </div>
+
+  <!-- Background Ambience -->
+  <div class="ambient-stage" aria-hidden="true"></div>
+
+  <!-- Background Flute Music (35s Peaceful Loop) -->
+  <audio id="bg-audio" src="assets/audio/flute-bgm.mp3" preload="auto" loop></audio>
+
+  <!-- Top Floating Sound Toggle -->
+  <button type="button" class="sound-toggle-btn" id="btn-sound" aria-label="बांसुरी संगीत चालू/बंद करें" title="बांसुरी संगीत">
+    <svg class="icon-sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+    </svg>
+    <svg class="icon-sound-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <line x1="23" y1="9" x2="17" y2="15"></line>
+      <line x1="17" y1="9" x2="23" y2="15"></line>
+    </svg>
+    <span class="sound-label">संगीत</span>
+  </button>
+
+  <!-- Full Screen Viewport & Book Stage -->
+  <main class="viewport-stage" id="viewport-stage">
+    <div class="zoom-wrapper" id="zoom-wrapper">
+      <div class="book-stage" id="book-stage">
+        <!-- StPageFlip Root -->
+        <div class="book" id="book"></div>
+
+        <!-- Touch / Click Tap Zones -->
+        <div class="tap-zone tap-left" id="tap-prev" aria-label="पिछला पृष्ठ"></div>
+        <div class="tap-zone tap-right" id="tap-next" aria-label="अगला पृष्ठ"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Minimal Floating Bottom Navigation Pill -->
+  <nav class="toolbar" id="toolbar" aria-label="नेविगेशन">
+    <button type="button" class="tb-btn" id="btn-prev" aria-label="पिछला पृष्ठ" disabled>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+
+    <div class="page-counter" id="page-counter">
+      <span id="counter-current">1</span>
+      <span style="opacity:0.4;">/</span>
+      <span id="counter-total">8</span>
+    </div>
+
+    <button type="button" class="tb-btn" id="btn-next" aria-label="अगला पृष्ठ">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+
+    <div class="tb-divider" aria-hidden="true"></div>
+
+    <button type="button" class="tb-btn tb-btn--share" id="btn-share" aria-label="शेयर करें">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+    </button>
+  </nav>
+
+  <!-- Share Sheet Modal -->
+  <div class="share-modal" id="share-modal" aria-hidden="true">
+    <div class="share-backdrop" id="share-backdrop"></div>
+    <div class="share-card">
+      <div class="share-card-header">
+        <h2>विवरणिका शेयर करें</h2>
+        <button type="button" class="share-close-btn" id="share-close-btn" aria-label="बंद करें">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="share-options">
+        <a href="#" class="share-option-btn share-wa" id="share-whatsapp" target="_blank" rel="noopener">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          <span>WhatsApp पर शेयर करें</span>
+        </a>
+        <button type="button" class="share-option-btn share-copy" id="share-copy-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>लिंक कॉपी करें</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">लिंक कॉपी हो गया</div>
+</body>
+</html>
