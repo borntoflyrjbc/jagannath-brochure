@@ -7,3 +7,4 @@ tmp/
 tools/_scratch/
 page_*_thumb.png
 inspect_pdf.py
+CREDENTIALS.md
