@@ -1,28 +1,28 @@
 /**
  * SINGLE SOURCE OF TRUTH — FLIPBOOK CONFIGURATION
- * All user-editable settings live here.
- * Adding/removing pages in pages[] updates the flipbook and counter automatically.
+ * E-Paper Edition: जय जगन्नाथ — जन-जन की आस्था, समाज की आवाज
+ * Dr. Purshottam Tiwari | Jai Jagannath Mission International
  */
 window.FLIPBOOK_CONFIG = {
   brand: {
     name: 'JAI JAGANNATH MISSION',
-    tagline: 'भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य',
+    tagline: 'ई-समाचार पत्र • भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य',
     logo: 'assets/brand/logo.svg',
     showBrandLogo: true,
-    logoPosition: 'top-left', // 'top-left' | 'top-center'
+    logoPosition: 'top-left',
     accentColor: '#D97706',
-    backgroundColor: '#0B0B0D'
+    backgroundColor: '#070709'
   },
   book: {
-    aspectRatio: 595 / 842, // A4 ratio (~0.7067) or 3 / 4 (0.75)
-    hardCovers: true,       // First and last pages get data-density="hard"
-    flippingTime: 620,      // Page turn speed in ms (450-650ms recommended)
-    openIntro: true         // Non-blocking cover-lift intro animation
+    aspectRatio: 1286 / 1800, // ~0.7144 ratio (Matches exact paper pages)
+    hardCovers: true,         // First and last pages get data-density="hard"
+    flippingTime: 520,        // Natural smooth page turn speed
+    openIntro: true
   },
   share: {
-    title: 'जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — भव्य आमंत्रण एवं विवरणिका',
-    text: 'भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य — विशेष डिजिटल विवरणिका देखें।',
-    whatsappCaption: 'जय जगन्नाथ! भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य कृति विमोचन समारोह की डिजिटल विवरणिका अवश्य देखें:'
+    title: 'जय जगन्नाथ ई-समाचार पत्र — विशेष 3D डिजिटल संस्करण',
+    text: 'जय जगन्नाथ (वर्ष 01, अंक 01) — भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य। विशेष डिजिटल विवरणिका व ई-पेपर पढ़ें।',
+    whatsappCaption: 'जय जगन्नाथ! "जय जगन्नाथ" ई-समाचार पत्र (विशेष 3D डिजिटल संस्करण) अवश्य पढ़ें:'
   },
   zoom: {
     min: 1,
@@ -30,13 +30,13 @@ window.FLIPBOOK_CONFIG = {
     step: 0.5
   },
   pages: [
-    { desktop: 'assets/pages/page-1.webp', mobile: 'assets/pages/mobile/page-1.webp', alt: 'मुखपृष्ठ - कृति विमोचन आमंत्रण' },
-    { desktop: 'assets/pages/page-2.webp', mobile: 'assets/pages/mobile/page-2.webp', alt: 'पृष्ठ 2 - आमंत्रण एवं कार्यक्रम विवरण' },
-    { desktop: 'assets/pages/page-3.webp', mobile: 'assets/pages/mobile/page-3.webp', alt: 'पृष्ठ 3 - महाप्रभु का महाअभियान' },
-    { desktop: 'assets/pages/page-4.webp', mobile: 'assets/pages/mobile/page-4.webp', alt: 'पृष्ठ 4 - जगन्नाथ पुरी एक दिव्य अनुभव' },
-    { desktop: 'assets/pages/page-5.webp', mobile: 'assets/pages/mobile/page-5.webp', alt: 'पृष्ठ 5 - आध्यात्मिक समूह से जुड़ें' },
-    { desktop: 'assets/pages/page-6.webp', mobile: 'assets/pages/mobile/page-6.webp', alt: 'पृष्ठ 6 - उद्देश्य, सन्देश एवं संकल्प' },
-    { desktop: 'assets/pages/page-7.webp', mobile: 'assets/pages/mobile/page-7.webp', alt: 'पृष्ठ 7 - अतिथिगण एवं श्री जगन्नाथ अर्जी पात्र' },
-    { desktop: 'assets/pages/page-8.webp', mobile: 'assets/pages/mobile/page-8.webp', alt: 'अंतिम पृष्ठ - आयोजन समिति एवं भक्ति सन्देश' }
+    { desktop: 'assets/pages/page-1.webp', mobile: 'assets/pages/mobile/page-1.webp', alt: 'मुखपृष्ठ - जय जगन्नाथ ई-समाचार पत्र (वर्ष 01, अंक 01)' },
+    { desktop: 'assets/pages/page-2.webp', mobile: 'assets/pages/mobile/page-2.webp', alt: 'पृष्ठ 2 - दवा मन को दबाती है, चेतना मन को बदलती है (अध्याय 6 से 15)' },
+    { desktop: 'assets/pages/page-3.webp', mobile: 'assets/pages/mobile/page-3.webp', alt: 'पृष्ठ 3 - महाप्रभु का महाअभियान — जगन्नाथ पुरी में है समस्या का समाधान' },
+    { desktop: 'assets/pages/page-4.webp', mobile: 'assets/pages/mobile/page-4.webp', alt: 'पृष्ठ 4 - डॉ. पुरुषोत्तम तिवारी की सर्वश्रेष्ठ पुस्तकें (भाग 1)' },
+    { desktop: 'assets/pages/page-5.webp', mobile: 'assets/pages/mobile/page-5.webp', alt: 'पृष्ठ 5 - सर्वश्रेष्ठ पुस्तकें एवं साहित्यिक संकल्प' },
+    { desktop: 'assets/pages/page-6.webp', mobile: 'assets/pages/mobile/page-6.webp', alt: 'पृष्ठ 6 - मन संवाद साधना शिविर — तीन दिवसीय कार्यक्रम' },
+    { desktop: 'assets/pages/page-7.webp', mobile: 'assets/pages/mobile/page-7.webp', alt: 'पृष्ठ 7 - जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — परिचय एवं दर्शन' },
+    { desktop: 'assets/pages/page-8.webp', mobile: 'assets/pages/mobile/page-8.webp', alt: 'अंतिम पृष्ठ - भगवान जगन्नाथ चेतना का भव्य आगाज (विमोचन समाचार)' }
   ]
 };

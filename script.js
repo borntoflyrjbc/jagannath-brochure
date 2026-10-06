@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
  * PREMIUM 3D FLIPBOOK ENGINE (WhatsApp-First, Full-Screen, Ambient Flute Audio)
- * Hyper-optimized swipe gestures, instant loading, peace-level audio loop
+ * E-Paper Edition: जय जगन्नाथ (वर्ष 01, अंक 01)
  * ==========================================================================
  */
 
@@ -20,14 +20,14 @@
 
   const config = window.FLIPBOOK_CONFIG || {
     book: {
-      aspectRatio: 595 / 842,
+      aspectRatio: 1286 / 1800,
       hardCovers: true,
-      flippingTime: 480
+      flippingTime: 520
     },
     share: {
-      title: 'जय जगन्नाथ मिशन अन्तर्राष्ट्रीय — भव्य आमंत्रण एवं विवरणिका',
-      text: 'भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य — विशेष डिजिटल विवरणिका देखें।',
-      whatsappCaption: 'जय जगन्नाथ! भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य कृति विमोचन समारोह की डिजिटल विवरणिका अवश्य देखें:'
+      title: 'जय जगन्नाथ ई-समाचार पत्र — विशेष 3D डिजिटल संस्करण',
+      text: 'जय जगन्नाथ (वर्ष 01, अंक 01) — भगवान जगन्नाथ चेतना और मानसिक स्वास्थ्य।',
+      whatsappCaption: 'जय जगन्नाथ! "जय जगन्नाथ" ई-समाचार पत्र (विशेष 3D डिजिटल संस्करण) अवश्य पढ़ें:'
     },
     pages: []
   };
@@ -49,6 +49,9 @@
       btnNext: document.getElementById('btn-next'),
       counterCurrent: document.getElementById('counter-current'),
       counterTotal: document.getElementById('counter-total'),
+      btnZoom: document.getElementById('btn-zoom'),
+      iconZoomIn: document.getElementById('icon-zoom-in'),
+      iconZoomOut: document.getElementById('icon-zoom-out'),
       btnShare: document.getElementById('btn-share'),
       shareModal: document.getElementById('share-modal'),
       shareBackdrop: document.getElementById('share-backdrop'),
@@ -94,8 +97,8 @@
       const img = document.createElement('img');
       img.src = getPageSrc(page);
       img.alt = page.alt || `पृष्ठ ${index + 1}`;
-      img.width = isMobile ? 707 : 990;
-      img.height = isMobile ? 1000 : 1400;
+      img.width = isMobile ? 1000 : 1286;
+      img.height = isMobile ? 1400 : 1800;
       img.decoding = 'async';
 
       if (isFirst) {
@@ -116,13 +119,47 @@
     }
   }
 
+  // --- Web Audio Soft Paper Rustle ---
+  let audioCtx = null;
+  function playPaperRustle() {
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const bufferSize = Math.floor(audioCtx.sampleRate * 0.12);
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+      }
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
+      filter.Q.setValueAtTime(1.6, audioCtx.currentTime);
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+
+      whiteNoise.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      whiteNoise.start();
+    } catch (_) {}
+  }
+
   // --- Background Peaceful Flute Music (Low Volume, Smooth Loop) ---
   function setupAudio() {
     const audio = dom.bgAudio;
     const btn = dom.btnSound;
     if (!audio || !btn) return;
 
-    // Peaceful low volume
     audio.volume = 0.25;
 
     const iconOn = btn.querySelector('.icon-sound-on');
@@ -164,7 +201,6 @@
       }
     });
 
-    // Auto-start on first user interaction anywhere
     const onFirstUserAction = () => {
       tryPlayAudio();
       window.removeEventListener('pointerdown', onFirstUserAction);
@@ -175,7 +211,7 @@
     window.addEventListener('touchstart', onFirstUserAction, { once: true });
   }
 
-  // --- Ultra-Fast Asset Loader (Instant Reveal as Soon as Page 1 is Ready) ---
+  // --- Ultra-Fast Asset Loader ---
   function loadAssetsFast(onReady) {
     const pages = config.pages || [];
     if (pages.length === 0) {
@@ -211,7 +247,7 @@
     if (typeof St === 'undefined' || !St.PageFlip) return;
 
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const ratio = config.book.aspectRatio || (595 / 842);
+    const ratio = config.book.aspectRatio || (1286 / 1800);
     const targetWidth = isMobile ? Math.min(window.innerWidth * 0.96, 500) : 520;
     const targetHeight = Math.round(targetWidth / ratio);
 
@@ -226,7 +262,7 @@
         maxHeight: 1450,
         drawShadow: true,
         maxShadowOpacity: 0.45,
-        flippingTime: config.book.flippingTime || 480,
+        flippingTime: config.book.flippingTime || 520,
         usePortrait: true,
         showCover: true,
         mobileScrollSupport: false,
@@ -243,6 +279,7 @@
       state.flip.on('flip', (e) => {
         state.currentPageIndex = e.data;
         updatePageCounter();
+        playPaperRustle();
       });
       state.flip.on('changeOrientation', updatePageCounter);
 
@@ -289,6 +326,9 @@
     }, { passive: true });
 
     dom.viewportStage.addEventListener('touchend', (e) => {
+      // If zoomed in, do not flip pages via swipe
+      if (state.zoomLevel > 1) return;
+
       if (e.changedTouches.length === 1) {
         const touchEndX = e.changedTouches[0].clientX;
         const touchEndY = e.changedTouches[0].clientY;
@@ -296,25 +336,165 @@
         const diffY = touchEndY - touchStartY;
         const duration = Date.now() - touchStartTime;
 
-        // If swipe gesture: horizontal distance > 28px, faster than 800ms, and mostly horizontal
         if (Math.abs(diffX) > 28 && Math.abs(diffX) > Math.abs(diffY) && duration < 800) {
           if (diffX < 0) {
-            // Swipe Left -> Next Page
             if (state.flip) state.flip.flipNext();
           } else {
-            // Swipe Right -> Previous Page
             if (state.flip) state.flip.flipPrev();
           }
         }
       }
     }, { passive: true });
 
-    // Tap zones (left 32% = prev, right 32% = next)
-    dom.tapPrev.addEventListener('click', (e) => {
-      if (state.flip) state.flip.flipPrev();
+    dom.tapPrev.addEventListener('click', () => {
+      if (state.zoomLevel === 1 && state.flip) state.flip.flipPrev();
     });
-    dom.tapNext.addEventListener('click', (e) => {
-      if (state.flip) state.flip.flipNext();
+    dom.tapNext.addEventListener('click', () => {
+      if (state.zoomLevel === 1 && state.flip) state.flip.flipNext();
+    });
+  }
+
+  // --- Double-Tap & Button Zoom & Pan Engine ---
+  function setupZoom() {
+    const btn = dom.btnZoom;
+    const wrapper = dom.zoomWrapper;
+    const stage = dom.viewportStage;
+    if (!wrapper || !stage) return;
+
+    let panX = 0;
+    let panY = 0;
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+    let lastTapTime = 0;
+    let lastTapX = 0;
+    let lastTapY = 0;
+
+    function applyTransform(animated = true) {
+      wrapper.style.transition = animated ? 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none';
+      if (state.zoomLevel > 1) {
+        wrapper.style.transform = `scale(${state.zoomLevel}) translate(${panX}px, ${panY}px)`;
+        wrapper.classList.add('panning');
+        if (dom.tapPrev) dom.tapPrev.style.pointerEvents = 'none';
+        if (dom.tapNext) dom.tapNext.style.pointerEvents = 'none';
+        if (dom.iconZoomIn) dom.iconZoomIn.style.display = 'none';
+        if (dom.iconZoomOut) dom.iconZoomOut.style.display = 'block';
+      } else {
+        wrapper.style.transform = '';
+        wrapper.classList.remove('panning');
+        if (dom.tapPrev) dom.tapPrev.style.pointerEvents = '';
+        if (dom.tapNext) dom.tapNext.style.pointerEvents = '';
+        if (dom.iconZoomIn) dom.iconZoomIn.style.display = 'block';
+        if (dom.iconZoomOut) dom.iconZoomOut.style.display = 'none';
+        panX = 0;
+        panY = 0;
+      }
+    }
+
+    function toggleZoom(originX = null, originY = null) {
+      if (state.zoomLevel > 1) {
+        state.zoomLevel = 1.0;
+        panX = 0;
+        panY = 0;
+      } else {
+        state.zoomLevel = 1.85;
+        if (originX !== null && originY !== null) {
+          const cx = window.innerWidth / 2;
+          const cy = window.innerHeight / 2;
+          panX = Math.max(-120, Math.min(120, (cx - originX) * 0.45));
+          panY = Math.max(-180, Math.min(180, (cy - originY) * 0.45));
+        } else {
+          panX = 0;
+          panY = 0;
+        }
+      }
+      applyTransform(true);
+    }
+
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleZoom();
+      });
+    }
+
+    stage.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      toggleZoom(e.clientX, e.clientY);
+    });
+
+    stage.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const now = Date.now();
+        const dist = Math.hypot(touch.clientX - lastTapX, touch.clientY - lastTapY);
+
+        if (now - lastTapTime < 320 && dist < 35) {
+          e.preventDefault();
+          toggleZoom(touch.clientX, touch.clientY);
+          lastTapTime = 0;
+          return;
+        }
+        lastTapTime = now;
+        lastTapX = touch.clientX;
+        lastTapY = touch.clientY;
+
+        if (state.zoomLevel > 1) {
+          isDragging = true;
+          startX = touch.clientX - panX * state.zoomLevel;
+          startY = touch.clientY - panY * state.zoomLevel;
+        }
+      }
+    }, { passive: false });
+
+    stage.addEventListener('touchmove', (e) => {
+      if (state.zoomLevel > 1 && isDragging && e.touches.length === 1) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        panX = (touch.clientX - startX) / state.zoomLevel;
+        panY = (touch.clientY - startY) / state.zoomLevel;
+
+        const limitX = (window.innerWidth * 0.45);
+        const limitY = (window.innerHeight * 0.45);
+        panX = Math.max(-limitX, Math.min(limitX, panX));
+        panY = Math.max(-limitY, Math.min(limitY, panY));
+
+        applyTransform(false);
+      }
+    }, { passive: false });
+
+    stage.addEventListener('touchend', () => {
+      if (isDragging) {
+        isDragging = false;
+        applyTransform(true);
+      }
+    });
+
+    stage.addEventListener('mousedown', (e) => {
+      if (state.zoomLevel > 1 && e.button === 0) {
+        isDragging = true;
+        startX = e.clientX - panX * state.zoomLevel;
+        startY = e.clientY - panY * state.zoomLevel;
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (state.zoomLevel > 1 && isDragging) {
+        panX = (e.clientX - startX) / state.zoomLevel;
+        panY = (e.clientY - startY) / state.zoomLevel;
+        const limitX = (window.innerWidth * 0.45);
+        const limitY = (window.innerHeight * 0.45);
+        panX = Math.max(-limitX, Math.min(limitX, panX));
+        panY = Math.max(-limitY, Math.min(limitY, panY));
+        applyTransform(false);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        applyTransform(true);
+      }
     });
   }
 
@@ -387,6 +567,7 @@
     generatePagesDOM();
     setupAudio();
     setupGestures();
+    setupZoom();
     setupShare();
     setupKeyboard();
 
