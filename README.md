@@ -1,152 +1,56 @@
-# 📖 Premium 3D Flipbook (WhatsApp-First, Static, PDF→Images Pipeline)
+# 📖 भगवान जगन्नाथ समाचार पत्र — 3D डिजिटल ई-समाचार पत्र एवं विवरणिका
 
-A zero-build, ultra-fast static web app presenting a **digital brochure as a realistic 3D flipbook** with real page-curl physics, ambient lighting, and instant loading on mobile networks.
-
-Built specifically to perform flawlessly inside **WhatsApp's in-app browser (Android WebView & iOS Safari View)** and on modern desktop browsers.
-
----
-
-## 1. What This Is
-- **Realistic 3D Page Flip:** Physics-driven 3D page curl powered by `StPageFlip` (`page-flip` v2.0.7) with hard front & back covers.
-- **WhatsApp-First Link Previews:** Pre-configured with raw Open Graph tags so WhatsApp, Telegram, Facebook, and LinkedIn show a rich preview card with image, title, and description before opening.
-- **Zero Build Step:** 100% pure vanilla HTML5, CSS3, and modern JavaScript. No Node.js build, no React, no bundler. Double-click `index.html` to run locally via `file://`.
-- **Lightweight & Fast:** Entire initial load payload is under ~200 KB; full brochure loads in under 2 seconds on Indian 4G.
-- **Single Source of Truth:** All branding, colors, pages, and behavior are configured in a single file: `config.js`.
+> **लाइव प्रोडक्शन वेबसाइट**: [https://jaijagannathmisiion.dpdns.org/](https://jaijagannathmisiion.dpdns.org/)  
+> **Vercel प्रोडक्शन**: [https://jagannath-brochure.vercel.app/](https://jagannath-brochure.vercel.app/)  
+> **GitHub रिपॉजिटरी**: [https://github.com/borntoflyrjbc/jagannath-brochure](https://github.com/borntoflyrjbc/jagannath-brochure)
 
 ---
 
-## 2. Replacing the Pages
-The brochure pages are stored as optimized `.webp` images in two resolutions for responsive loading:
-
-| Variant | Folder Path | Dimensions / Long Edge | Target Size |
-|---|---|---|---|
-| **Desktop** | `assets/pages/page-N.webp` | 1600px long edge | 150–350 KB |
-| **Mobile** | `assets/pages/mobile/page-N.webp` | 1100px long edge | 80–180 KB |
-
-- **Naming format:** `page-1.webp`, `page-2.webp`, ... `page-N.webp`
-- **Aspect ratio:** 3:4 portrait (0.75) or A4 portrait (0.7067). Maintain uniform aspect ratio across all pages.
-- **Max payload:** Keep total bundle under 2.5 MB for instant mobile loading.
-
----
-
-## 3. How to Convert a New PDF to Images
-
-### Path A (Primary) — Browser-Based Exporter (No installation needed)
-1. Double-click `tools/pdf-to-images.html` to open it in Google Chrome or any modern browser.
-2. Drag and drop your new PDF brochure into the drop zone (conversion is 100% private and client-side; no file is uploaded anywhere).
-3. The tool renders every page on a white canvas to avoid black transparency bugs.
-4. Click **Download Desktop Set** and **Download Mobile Set** to sequentially save all `.webp` files into your `Downloads` folder.
-5. Move the desktop files into `assets/pages/` and the mobile files into `assets/pages/mobile/`.
-6. Copy the auto-generated `pages: [...]` code snippet printed at the bottom into `config.js`.
-
-### Path B (Power Users) — CLI Script via Bash
-If you have `poppler-utils` (`pdftoppm`) and `cwebp` installed:
-```bash
-cd tools/
-chmod +x convert.sh
-./convert.sh path/to/brochure.pdf
-```
-*(ImageMagick alternative commands are included in comments inside `convert.sh`)*.
-
-### Path C (Architectural Seam — Future In-App PDF Mode)
-`config.js` and `script.js` are cleanly decoupled from the asset source. If in the future you wish to render PDFs directly on client devices, you can dynamically populate the `config.pages[]` array from a `loadPagesFromPdf(url)` routine yielding blob URLs, feeding directly into the existing `generatePagesDOM()` and `loadFromHTML()` pipeline without altering the flipbook engine.
+## ⚡ मुख्य विशेषताएं (Key Architecture)
+1. **सीनियर-फ्रेंडली अल्ट्रा-शार्प फॉन्ट (Senior-Friendly Readability)**:
+   - अखबार के छोटे देवनागरी अक्षरों को बुजुर्ग पाठकों के लिए स्पष्ट रखने हेतु मोबाइल रेजोल्यूशन **1350×1890 px** रखा गया है।
+   - फॉन्ट पर **Unsharp-Masking Filter (radius 1.0, 125% contrast)** लगाया गया है जिससे बिना ज़ूम किए भी हर मात्रा और पूर्ण विराम स्पष्ट दिखता है।
+2. **1.95× मैग्निफिकेशन ज़ूम & पैन (Double-Tap & Toolbar 🔍)**:
+   - फोन पर स्क्रीन पर कहीं भी डबल-टैप करने या टूलबार में 🔍 आइकन दबाने पर 1.95× मैग्निफिकेशन सक्रिय होता है।
+   - ज़ूम स्थिति में ड्रैग/पैन करके किसी भी कॉलम को आसानी से पढ़ा जा सकता है और पेज गलती से नहीं पलटता।
+3. **ज़ीरो-लैग डुअल प्रीलोड (Zero-Blank Dual-Page Preloading)**:
+   - पेज 1 और पेज 2 दोनों बैकग्राउंड मेमोरी में 100% लोड होने के बाद ही प्रीलोडर हटता है।
+   - इससे पहले पन्ने को पलटते ही पेज 2 **0ms (बिना किसी सफेद स्क्रीन के)** तुरंत दिखाई देता है।
+4. **WhatsApp 16:9 कस्टम थंबनेल**:
+   - `assets/og-preview.jpg` (1200×675 px, 282 KB, < 300 KB WhatsApp limit)।
+   - WhatsApp पर शेयर करते समय टाइटल स्ट्रिक्टली: **भगवान जगन्नाथ समाचार पत्र -1** आता है।
+5. **ऑडियो वातावरण**:
+   - शांत बांसुरी बीजीएम लूप (35s, 0.25 वॉल्यूम) + टॉप-राइट "संगीत" टॉगल।
+   - पन्ना पलटने पर Web Audio API से सिंथेसाइज़्ड ऑर्गेनिक पेपर रस्टल साउंड।
 
 ---
 
-## 4. Customizing Branding
-Open `config.js` to change any setting:
+## 🛠️ नया अंक (Next Edition) कैसे अपलोड करें:
 
-```javascript
-window.FLIPBOOK_CONFIG = {
-  brand: {
-    name: 'YOUR BRAND NAME',
-    tagline: 'Your Tagline Here',
-    logo: 'assets/brand/logo.svg',       // Brand logo path
-    showBrandLogo: true,                 // Set false to hide
-    logoPosition: 'top-left',            // 'top-left' | 'top-center'
-    accentColor: '#D97706',              // Primary brand accent (Gold/Amber)
-    backgroundColor: '#0B0B0D'          // Luxury dark stage background
-  },
-  book: {
-    aspectRatio: 595 / 842,              // A4 (0.7067) or 3 / 4 (0.75)
-    hardCovers: true,                    // Page 1 and Last Page as hard covers
-    flippingTime: 620,                   // Flip animation duration in ms
-    openIntro: true                      // Cover-lift preview animation
-  },
-  share: {
-    title: 'Brochure Title',
-    text: 'Check out our digital brochure',
-    whatsappCaption: 'Take a look at our new brochure:'
-  }
-};
-```
-Branding colors and styles update instantly across the entire interface via CSS variables.
+भविष्य में अंक 2 या नया पेपर आने पर:
+
+1. **नए पेपर्स रखें**:
+   - नए पेपर्स को किसी फ़ोल्डर (जैसे `Downloads/PAPER-2/`) में 01 से 08 के क्रम में रखें।
+2. **कन्वर्जन स्क्रिप्ट चलाएं**:
+   ```bash
+   python "C:\Users\MY PC\.gemini\antigravity-ide\scratch\make_ultra_sharp_pages.py"
+   ```
+   (यह अपने आप 1350×1890 मोबाइल और 1800×2520 डेस्कटॉप वेबपी फाइलें बना देगा)।
+3. **थंबनेल और टाइटल अपडेट करें**:
+   - नया थंबनेल `assets/og-preview.jpg` में सेव करें (1200×675 px, < 300 KB)।
+   - `index.html` और `config.js` में टाइटल (जैसे `भगवान जगन्नाथ समाचार पत्र -2`) और `?v=...` कैश बस्टर बदलें।
+4. **GitHub पर पुश करें**:
+   ```bash
+   cd "C:\Users\MY PC\.gemini\antigravity-ide\scratch\flipbook"
+   git add .
+   git commit -m "Publish Edition 2"
+   git push origin main
+   ```
+   *Vercel और डिजिटलप्लेट डोमेन 60 सेकंड में अपने आप लाइव हो जाएंगे!*
 
 ---
 
-## 5. Changing Page Count
-To add or remove pages:
-1. Place the new `page-N.webp` files in `assets/pages/` and `assets/pages/mobile/`.
-2. Update the `pages: [...]` array in `config.js`.
-3. **Odd Page Count Handling:** StPageFlip requires an even number of pages for two-page spreads. If your brochure has an odd number of pages (e.g., 5, 7, 9), our runtime automatically appends a styled blank filler page in spread mode so that the back cover closes correctly. The counter will only display the real page count.
-
----
-
-## 6. Updating the WhatsApp & Social Link Preview
-When a link is shared on WhatsApp, WhatsApp's crawler inspects the raw HTML `<meta property="og:*">` tags.
-
-1. **OG Image Format:** WhatsApp **does not support WebP** for link previews. Always use a standard **JPG** or **PNG** at **1200×630 pixels**, under 300 KB.
-2. Replace `assets/og-preview.jpg` with your own 1200×630 image (or generate one using `tools/pdf-to-images.html`).
-3. In `index.html`, replace all occurrences of `__SITE_URL__` with your live production URL (e.g., `https://yourbrand.vercel.app`).
-4. **Cache Busting:** WhatsApp caches OG link previews aggressively. If you update the image after deploying, append `?v=2` to the image URL in `index.html`.
-
----
-
-## 7. Deployment Guide — Vercel (Recommended, Free, 2 Minutes)
-1. Push your flipbook repository to GitHub or upload the folder.
-2. Go to [vercel.com](https://vercel.com) and log in.
-3. Click **Add New** → **Project** → **Import** your repository.
-4. Under Build & Development Settings:
-   - **Framework Preset:** `Other`
-   - **Build Command:** *(leave empty)*
-   - **Output Directory:** `./`
-5. Click **Deploy**.
-6. Copy your generated live URL (e.g., `https://brochure-3d.vercel.app`).
-7. Open `index.html`, replace `__SITE_URL__` with your live domain, commit, and push.
-8. Your brochure is ready to share on WhatsApp!
-
----
-
-## 8. Deployment Alternatives — GitHub Pages & Netlify Drop
-
-### GitHub Pages (Free)
-1. Push the folder to a GitHub repository.
-2. Go to **Settings** → **Pages**.
-3. Under **Branch**, select `main` (or `master`) and folder `/(root)`, then click **Save**.
-4. Your site will be live at `https://<username>.github.io/<repo-name>/`.
-5. Update `__SITE_URL__` in `index.html` with this URL.
-
-### Netlify Drop (Instant Drag & Drop)
-1. Visit [app.netlify.com/drop](https://app.netlify.com/drop).
-2. Drag and drop the `flipbook` folder directly into the browser window.
-3. ⚠️ **Important Warning:** An unclaimed Netlify Drop site is temporary and is deleted after ~1 hour unless you log in and claim the site into an account. Always sign in to make the site permanent.
-
----
-
-## 9. Troubleshooting & Edge Cases
-
-- **WhatsApp preview card is not showing:**
-  - Verify that `__SITE_URL__` in `index.html` was replaced with the real `https://` URL.
-  - Verify that `assets/og-preview.jpg` is a real JPEG (not renamed WebP) and under 300 KB.
-  - Test the URL on [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or LinkedIn Post Inspector.
-- **Fullscreen button missing on iPhone / iOS Safari:**
-  - iOS Safari on iPhone does not support the Element Fullscreen API. The app automatically detects this and transitions smoothly into **Immersive Mode** (auto-fading the toolbar and logo after 2.8s of inactivity, tapping reveals them).
-- **CDN blocked on certain mobile networks:**
-  - The site includes a multi-layer fallback. If jsDelivr CDN is blocked by an ISP, the site automatically detects `window.St` and injects `vendor/page-flip.browser.min.js` and `vendor/page-flip.css`.
-  - If JavaScript is severely blocked or fails, the app automatically presents a clean, vertical-scrolling reading view (`fallback-viewer`).
-
----
-
-## 10. License & Attributions
-- **StPageFlip (`page-flip`):** MIT License. Copyright (c) 2020 Mikhail Sakhnyuk. Real 3D canvas/HTML page-curl physics.
-- **PDF.js (`pdfjs-dist`):** Apache License 2.0. Copyright (c) Mozilla Foundation. Used exclusively inside the local offline dev tool (`tools/pdf-to-images.html`). Never shipped on the live website.
+## 📂 बैकअप और सुरक्षित स्टोरेज
+* **पुराना ब्रोशर बैकअप**: `D:\Backup\flipbook-old-jaijagannathmission-backup`
+* **अंक 1 सम्पूर्ण बैकअप**: `D:\Backup\flipbook-epaper-edition-1-backup`
+* **क्रेडेंशियल वॉल्ट**: `CREDENTIALS.md`
