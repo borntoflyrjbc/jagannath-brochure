@@ -2,6 +2,7 @@
  * ==========================================================================
  * PREMIUM 3D FLIPBOOK ENGINE (WhatsApp-First, Full-Screen, Ambient Flute Audio)
  * E-Paper Edition: जय जगन्नाथ (वर्ष 01, अंक 01)
+ * Ultra-Sharp, Senior-Friendly Readability with Zero-Lag Dual-Page Preload
  * ==========================================================================
  */
 
@@ -97,15 +98,21 @@
       const img = document.createElement('img');
       img.src = getPageSrc(page);
       img.alt = page.alt || `पृष्ठ ${index + 1}`;
-      img.width = isMobile ? 1000 : 1286;
-      img.height = isMobile ? 1400 : 1800;
+      img.width = isMobile ? 1350 : 1800;
+      img.height = isMobile ? 1890 : 2520;
       img.decoding = 'async';
+      img.loading = 'eager'; // Crucial: eager load so page turns never render blank
 
-      if (isFirst) {
+      if (index < 2) {
         img.setAttribute('fetchpriority', 'high');
-      } else if (index > 1) {
-        img.loading = 'lazy';
       }
+
+      // Auto-retry recovery on cellular network glitch
+      img.onerror = () => {
+        setTimeout(() => {
+          img.src = getPageSrc(page) + `?t=${Date.now()}`;
+        }, 800);
+      };
 
       pageEl.appendChild(img);
       dom.book.appendChild(pageEl);
@@ -211,7 +218,7 @@
     window.addEventListener('touchstart', onFirstUserAction, { once: true });
   }
 
-  // --- Ultra-Fast Asset Loader ---
+  // --- Zero-Lag Preloader (Preloads Page 1 AND Page 2 before reveal) ---
   function loadAssetsFast(onReady) {
     const pages = config.pages || [];
     if (pages.length === 0) {
@@ -219,20 +226,41 @@
       return;
     }
 
-    const firstPage = pages[0];
-    const img = new Image();
-    img.src = getPageSrc(firstPage);
+    // Immediately kick off preload of ALL pages in parallel
+    pages.forEach((p) => {
+      const preloadImg = new Image();
+      preloadImg.src = getPageSrc(p);
+    });
 
-    const proceed = () => {
-      onReady();
-      dismissPreloader();
+    // Ensure Page 1 AND Page 2 are fully in memory before showing the book
+    const pagesToWait = Math.min(2, pages.length);
+    let loadedCount = 0;
+
+    const onSingleLoaded = () => {
+      loadedCount++;
+      if (loadedCount >= pagesToWait) {
+        onReady();
+        dismissPreloader();
+      }
     };
 
-    if (img.decode) {
-      img.decode().then(proceed).catch(proceed);
-    } else {
-      img.onload = img.onerror = proceed;
+    for (let i = 0; i < pagesToWait; i++) {
+      const img = new Image();
+      img.src = getPageSrc(pages[i]);
+      if (img.decode) {
+        img.decode().then(onSingleLoaded).catch(onSingleLoaded);
+      } else {
+        img.onload = img.onerror = onSingleLoaded;
+      }
     }
+
+    // Safety fallback: dismiss preloader after max 2.5s even if slow network
+    setTimeout(() => {
+      if (dom.preloader && !dom.preloader.classList.contains('hidden')) {
+        onReady();
+        dismissPreloader();
+      }
+    }, 2500);
   }
 
   function dismissPreloader() {
@@ -248,7 +276,7 @@
 
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
     const ratio = config.book.aspectRatio || (1286 / 1800);
-    const targetWidth = isMobile ? Math.min(window.innerWidth * 0.96, 500) : 520;
+    const targetWidth = isMobile ? Math.min(window.innerWidth * 0.96, 520) : 530;
     const targetHeight = Math.round(targetWidth / ratio);
 
     try {
@@ -257,9 +285,9 @@
         height: targetHeight,
         size: 'stretch',
         minWidth: 260,
-        maxWidth: 1100,
+        maxWidth: 1200,
         minHeight: 360,
-        maxHeight: 1450,
+        maxHeight: 1600,
         drawShadow: true,
         maxShadowOpacity: 0.45,
         flippingTime: config.book.flippingTime || 520,
@@ -326,7 +354,6 @@
     }, { passive: true });
 
     dom.viewportStage.addEventListener('touchend', (e) => {
-      // If zoomed in, do not flip pages via swipe
       if (state.zoomLevel > 1) return;
 
       if (e.changedTouches.length === 1) {
@@ -397,12 +424,12 @@
         panX = 0;
         panY = 0;
       } else {
-        state.zoomLevel = 1.85;
+        state.zoomLevel = 1.95; // 1.95x magnification for crystal-clear readability
         if (originX !== null && originY !== null) {
           const cx = window.innerWidth / 2;
           const cy = window.innerHeight / 2;
-          panX = Math.max(-120, Math.min(120, (cx - originX) * 0.45));
-          panY = Math.max(-180, Math.min(180, (cy - originY) * 0.45));
+          panX = Math.max(-140, Math.min(140, (cx - originX) * 0.45));
+          panY = Math.max(-200, Math.min(200, (cy - originY) * 0.45));
         } else {
           panX = 0;
           panY = 0;
@@ -454,8 +481,8 @@
         panX = (touch.clientX - startX) / state.zoomLevel;
         panY = (touch.clientY - startY) / state.zoomLevel;
 
-        const limitX = (window.innerWidth * 0.45);
-        const limitY = (window.innerHeight * 0.45);
+        const limitX = (window.innerWidth * 0.5);
+        const limitY = (window.innerHeight * 0.5);
         panX = Math.max(-limitX, Math.min(limitX, panX));
         panY = Math.max(-limitY, Math.min(limitY, panY));
 
@@ -482,8 +509,8 @@
       if (state.zoomLevel > 1 && isDragging) {
         panX = (e.clientX - startX) / state.zoomLevel;
         panY = (e.clientY - startY) / state.zoomLevel;
-        const limitX = (window.innerWidth * 0.45);
-        const limitY = (window.innerHeight * 0.45);
+        const limitX = (window.innerWidth * 0.5);
+        const limitY = (window.innerHeight * 0.5);
         panX = Math.max(-limitX, Math.min(limitX, panX));
         panY = Math.max(-limitY, Math.min(limitY, panY));
         applyTransform(false);
